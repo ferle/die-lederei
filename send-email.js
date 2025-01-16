@@ -68,6 +68,8 @@ async function sendEmail(transporter, email, retries = 3) {
       if (attempt === retries) return { success: false, error: error.message };
       // Wait before retrying (exponential backoff)
       await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 1000));
+
+      
     }
   }
 }
