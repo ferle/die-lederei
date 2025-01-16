@@ -15,6 +15,8 @@ const supabase = createClient(
 async function createTransporter(retries = 3) {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
+
+    console.log(test);
       const transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST || 'smtp.world4you.com',
         port: parseInt(process.env.SMTP_PORT || '587'),
@@ -69,7 +71,7 @@ async function sendEmail(transporter, email, retries = 3) {
       // Wait before retrying (exponential backoff)
       await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 1000));
 
-      
+
     }
   }
 }
