@@ -15,8 +15,6 @@ const supabase = createClient(
 async function createTransporter(retries = 3) {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
-
-    console.log(test);
       const transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST || 'smtp.world4you.com',
         port: parseInt(process.env.SMTP_PORT || '587'),
