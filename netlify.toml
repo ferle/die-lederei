@@ -1,6 +1,11 @@
-   [functions]
-     node_bundler = "esbuild"
+[build]
+  command = "npm run build" # Adjust this command if your build process is different
+  publish = "dist"          # Replace "dist" with your build output directory
 
-   [[functions.schedule]]
-     function = "email-service"
-     cron = "*/15 * * * *" # Runs every 15 minutes
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild" # Use "esbuild" for smaller and faster builds
+
+[[functions.schedule]]
+  name = "email-service"
+  cron = "*/15 * * * *" # This cron syntax schedules the function to run every 15 minutes
