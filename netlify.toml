@@ -1,0 +1,6 @@
+   [functions]
+     node_bundler = "esbuild"
+
+   [[functions.schedule]]
+     function = "email-service"
+     cron = "*/15 * * * *" # Runs every 15 minutes
