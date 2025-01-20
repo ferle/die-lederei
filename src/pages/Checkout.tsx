@@ -88,7 +88,8 @@ export function Checkout() {
             .select('*')
             .eq('id', user.id)
             .single();
-
+        console.log(error);
+        
         if (error) throw error;
 
         if (userData) {
@@ -126,19 +127,10 @@ export function Checkout() {
         throw new Error('Stripe ist nicht verfügbar. Bitte versuchen Sie es später erneut.');
       }
 
-      // Confirm payment with Stripe
-      const { error: stripeError } = await stripe.confirmPayment({
-        elements,
-        confirmParams: {
-          return_url: `${window.location.origin}/CheckoutSuccess`, // Redirect URL on success
-          receipt_email: form.email, // Optional: Send receipt to this email
-        },
-      });
-
-      if (stripeError) {
-        throw new Error(stripeError.message);
+      if (!form.first_name || !form.last_name || !form.email || !form.address || !form.city || !form.postalCode || !form.country) {
+        throw new Error('Bitte füllen Sie alle Pflichtfelder aus.');
       }
-
+      
       // Create order in the database
       const { data: order, error: orderError } = await supabase
           .from('orders')
@@ -147,12 +139,16 @@ export function Checkout() {
             customer_email: form.email,
             shipping_address: `${form.address}\n${form.postalCode} ${form.city}\n${form.country}`,
             total_amount: totalPrice(),
-            notes: form.notes,
-            user_id: user?.id || null
+            notes: form.notes || 'EMPTY',
+            user_id: user?.id || null,
+            customer_phone: form.phone || null,
+            status: 'pending', // Default status for new orders
+            created_at: new Date().toISOString(), // Add created_at field
           })
           .select()
           .single();
 
+      console.log(orderError);
       if (orderError) throw orderError;
 
       const orderItems = items.map((item) => ({
@@ -169,23 +165,220 @@ export function Checkout() {
       if (itemsError) throw itemsError;
 
       clearCart();
+
+      // Confirm payment with Stripe
+      const { error: stripeError } = await stripe.confirmPayment({
+        elements,
+        confirmParams: {
+          return_url: `${window.location.origin}/CheckoutSuccess`, // Redirect URL on success
+          receipt_email: form.email, // Optional: Send receipt to this email
+        },
+      });
+
+
+      if (stripeError) {
+        throw new Error(stripeError.message);
+      }
+      
     } catch (error: any) {
       setError(error.message || 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.');
     } finally {
       setIsLoading(false);
     }
+    
+    
   };
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setForm(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }));
+  };
+  
   if (!hasCheckedCart) return null;
 
   if (items.length === 0) return null;
 
   return (
+      
       <div className="min-h-screen bg-burgundy-50 py-12">
         {isLoading && <LoadingOverlay />}
 
         <div className="max-w-7xl mx-auto px-6 lg:px-12">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          <div className="grid grid-cols-1 lg:grid-cols-1 gap-12">
+            {/*Login / Register*/}
+            <div className="bg-white p-8 rounded-lg shadow-lg h-fit text-center">
+              <p className="text-gray-600 mb-4">
+                Sie können als Gast bestellen oder sich anmelden, um von den Vorteilen eines Kundenkontos zu
+                profitieren.
+              </p>
+              <div className="flex justify-center gap-4">
+                <Link
+                    to="/login"
+                    state={{returnTo: '/checkout'}}
+                    className="px-6 py-2 bg-burgundy-700 text-white rounded hover:bg-burgundy-800 transition"
+                >
+                  Anmelden
+                </Link>
+                <Link
+                    to="/register"
+                    className="px-6 py-2 bg-burgundy-50 text-burgundy-700 rounded hover:bg-burgundy-100 transition"
+                >
+                  Registrieren
+                </Link>
+              </div>
+            </div>
+            {/*Form Data*/}
+            <div className="bg-white p-8 rounded-lg shadow-lg h-fit">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="first_name" className="block text-sm font-medium text-gray-700">
+                      Vorname*
+                    </label>
+                    <input
+                        type="text"
+                        id="first_name"
+                        name="first_name"
+                        required
+                        value={form.first_name}
+                        onChange={handleChange}
+                        className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-burgundy-500 focus:border-burgundy-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="last_name" className="block text-sm font-medium text-gray-700">
+                      Nachname*
+                    </label>
+                    <input
+                        type="text"
+                        id="last_name"
+                        name="last_name"
+                        required
+                        value={form.last_name}
+                        onChange={handleChange}
+                        className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-burgundy-500 focus:border-burgundy-500"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                    E-Mail*
+                  </label>
+                  <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      required
+                      value={form.email}
+                      onChange={handleChange}
+                      className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-burgundy-500 focus:border-burgundy-500"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+                    Telefon
+                  </label>
+                  <input
+                      type="tel"
+                      id="phone"
+                      name="phone"
+                      value={form.phone}
+                      onChange={handleChange}
+                      className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-burgundy-500 focus:border-burgundy-500"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="address" className="block text-sm font-medium text-gray-700">
+                    Straße und Hausnummer*
+                  </label>
+                  <input
+                      ref={addressInputRef}
+                      type="text"
+                      id="address"
+                      name="address"
+                      required
+                      value={form.address}
+                      onChange={handleChange}
+                      className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-burgundy-500 focus:border-burgundy-500"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="postalCode" className="block text-sm font-medium text-gray-700">
+                      PLZ*
+                    </label>
+                    <input
+                        type="text"
+                        id="postalCode"
+                        name="postalCode"
+                        required
+                        value={form.postalCode}
+                        onChange={handleChange}
+                        className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-burgundy-500 focus:border-burgundy-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="city" className="block text-sm font-medium text-gray-700">
+                      Ort*
+                    </label>
+                    <input
+                        type="text"
+                        id="city"
+                        name="city"
+                        required
+                        value={form.city}
+                        onChange={handleChange}
+                        className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-burgundy-500 focus:border-burgundy-500"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="country" className="block text-sm font-medium text-gray-700">
+                    Land*
+                  </label>
+                  <input
+                      type="text"
+                      id="country"
+                      name="country"
+                      required
+                      value={form.country}
+                      onChange={handleChange}
+                      className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-burgundy-500 focus:border-burgundy-500"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="notes" className="block text-sm font-medium text-gray-700">
+                    Anmerkungen
+                  </label>
+                  <textarea
+                      id="notes"
+                      name="notes"
+                      rows={3}
+                      value={form.notes}
+                      onChange={handleChange}
+                      className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-burgundy-500 focus:border-burgundy-500"
+                  />
+                </div>
+
+                {/*<button*/}
+                {/*    type="submit"*/}
+                {/*    className="w-full py-3 px-4 bg-burgundy-700 text-white rounded-lg hover:bg-burgundy-800 transition"*/}
+                {/*>*/}
+                {/*  Jetzt kostenpflichtig bestellen*/}
+                {/*</button>*/}
+              </form>
+            </div>
+            {/*Bestellübersicht*/}
             <div className="bg-white p-8 rounded-lg shadow-lg h-fit">
               <h2 className="text-2xl font-medium mb-6">Bestellübersicht</h2>
               {items.length === 0 ? (
@@ -194,24 +387,39 @@ export function Checkout() {
                   <ul>
                     {items.map((item) => (
                         <li key={item.id} className="flex justify-between items-center mb-4">
-                          <div>
-                            <p className="font-medium">{item.name}</p>
-                            <p className="text-sm text-gray-600">
-                              {item.quantity} x €{(item.price / 100).toFixed(2)}
-                            </p>
+                          {/* Image Section */}
+                          <div className="flex items-center space-x-4">
+                            <div className="w-20 h-20 flex-shrink-0 relative overflow-hidden">
+                              <img
+                                  src="https://images.unsplash.com/photo-1638247025967-b4e38f787b76?w=600&amp;fit=crop&amp;q=85&amp;fm=webp"
+                                  alt={item.name}
+                                  className="w-full h-full object-cover rounded-md"
+                                  loading="lazy"
+                              />
+                            </div>
+                            {/* Text Section */}
+                            <div>
+                              <p className="font-medium">{item.name}</p>
+                              <p className="text-sm text-gray-600">
+                                {item.quantity} x €{(item.price / 100).toFixed(2)}
+                              </p>
+                            </div>
                           </div>
+
+                          {/* Price Section */}
                           <p className="font-bold">€{((item.price * item.quantity) / 100).toFixed(2)}</p>
                         </li>
+
                     ))}
                   </ul>
               )}
 
-              <div className="border-t mt-4 pt-4">
-                <p className="font-medium text-lg">Gesamt: €{(totalPrice() / 100).toFixed(2)}</p>
+              <div className="border-t mt-4 pt-4 text-right">
+                <p className="text-lg font-bold">Gesamt: €{(totalPrice() / 100).toFixed(2)}</p>
               </div>
             </div>
-
-            <div className="bg-white p-8 rounded-lg shadow-lg">
+            {/*Payment*/}
+            <div className="bg-white p-8 rounded-lg shadow-lg h-fit">
               <h2 className="text-2xl font-medium mb-6">Ihre Zahlungsdaten</h2>
 
               {error && (
@@ -222,7 +430,7 @@ export function Checkout() {
 
               {clientSecret ? (
                   <form onSubmit={handleSubmit}>
-                    <PaymentElement />
+                    <PaymentElement/>
                     <button
                         type="submit"
                         className="w-full py-3 px-4 bg-burgundy-700 text-white rounded-lg hover:bg-burgundy-800 transition mt-4"

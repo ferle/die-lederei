@@ -18,6 +18,7 @@ interface OrderItem {
 }
 
 interface Order {
+  phone: string | null;
   id: string;
   created_at: string;
   status: 'pending' | 'processing' | 'completed' | 'cancelled';
@@ -73,15 +74,13 @@ export function OrderDetail() {
         // Fetch order items with product details
         const { data: itemsData, error: itemsError } = await supabase
           .from('order_items')
-          .select(`
-            *,
-            product:product_id (
-              name,
-              image_url
-            )
-          `)
-          .eq('order_id', id);
-
+          .select(`*`)
+          .eq('order_id', "bd24f493-66a4-4295-8bae-414f6d55378c");
+        
+        console.log("order_id: " + id);
+        console.log("items: " + itemsData);
+        console.log(itemsError);
+        
         if (itemsError) throw itemsError;
         if (itemsData) setOrderItems(itemsData);
       } catch (error) {
@@ -266,13 +265,13 @@ export function OrderDetail() {
                       <Mail className="w-4 h-4 mr-2" />
                       {order.customer_email}
                     </a>
-                    {order.user?.phone && (
+                    {order.phone && (
                       <a
-                        href={`tel:${order.user.phone}`}
+                        href={`tel:${order.user?.phone}`}
                         className="flex items-center text-burgundy-700 hover:text-burgundy-800"
                       >
                         <Phone className="w-4 h-4 mr-2" />
-                        {order.user.phone}
+                        {order.phone}
                       </a>
                     )}
                   </div>

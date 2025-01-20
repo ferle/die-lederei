@@ -44,8 +44,10 @@ export default function App() {
   useEffect(() => {
     async function fetchClientSecret() {
       try {
+        console.log(totalPrice());
+        
         const { data } = await axios.post('http://localhost:3001/create-payment-intent', {
-          amount:  totalPrice(), // Ensure this is in cents
+          amount:  5000, // Ensure this is in cents
           currency: 'eur',
         });
         setClientSecret(data.clientSecret);
