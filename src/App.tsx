@@ -29,7 +29,6 @@ import { useCartStore } from './store/cartStore';
 import { Footer } from './components/Footer';
 import { CartDrawer } from './components/CartDrawer';
 
-// Stripe Public Key
 const stripePromise = loadStripe('pk_test_51QilW7PxH6E6bhVrJ6AR8hWV3fNks7Ki3OItqfP9v6ymEriL7xg4Qx6S2mpnkQadsClFGMpN4VDekv50tlumSAxT00NOm6cL93');
 
 export default function App() {
@@ -40,14 +39,11 @@ export default function App() {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch clientSecret from backend
   useEffect(() => {
     async function fetchClientSecret() {
       try {
-        console.log(totalPrice());
-        
         const { data } = await axios.post('http://localhost:3001/create-payment-intent', {
-          amount:  5000, // Ensure this is in cents
+          amount: 5000,
           currency: 'eur',
         });
         setClientSecret(data.clientSecret);
@@ -65,7 +61,7 @@ export default function App() {
   }
 
   if (!clientSecret) {
-    return <div>Lade Zahlungsdetails...</div>;
+    return <div></div>;
   }
 
   return (
@@ -95,8 +91,8 @@ export default function App() {
                     <ShoppingBag className="w-6 h-6" />
                     {totalItems() > 0 && (
                         <span className="absolute -top-2 -right-2 bg-burgundy-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
-                    {totalItems()}
-                  </span>
+                      {totalItems()}
+                    </span>
                     )}
                   </button>
                   {user ? (
@@ -119,6 +115,52 @@ export default function App() {
                 </button>
               </div>
             </div>
+
+            {/* Mobile Navigation */}
+            {isMobileMenuOpen && (
+                <nav className="md:hidden bg-white border-b border-stone-200 p-5">
+                  <ul className="space-y-4 text-lg text-burgundy-800 text-right">
+                    <li>
+                      <Link
+                          to="/"
+                          className="block hover:text-burgundy-600 transition"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        Startseite
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                          to="/shop"
+                          className="block hover:text-burgundy-600 transition"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        Shop
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                          to="/about"
+                          className="block hover:text-burgundy-600 transition"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        Über mich
+                      </Link>
+                    </li>
+                    {isAdmin && (
+                        <li>
+                          <Link
+                              to="/admin"
+                              className="block hover:text-burgundy-600 transition"
+                              onClick={() => setIsMobileMenuOpen(false)}
+                          >
+                            Admin
+                          </Link>
+                        </li>
+                    )}
+                  </ul>
+                </nav>
+            )}
 
             {/* Overlapping Logo */}
             <div className="absolute left-12 lg:left-24 top-2">

@@ -74,12 +74,17 @@ export function OrderDetail() {
         // Fetch order items with product details
         const { data: itemsData, error: itemsError } = await supabase
           .from('order_items')
-          .select(`*`)
-          .eq('order_id', "bd24f493-66a4-4295-8bae-414f6d55378c");
+          .select(`
+            *,
+            product:product_id (
+              name,
+              image_url
+            )
+          `)
+          .eq('order_id', id);
         
         console.log("order_id: " + id);
         console.log("items: " + itemsData);
-        console.log(itemsError);
         
         if (itemsError) throw itemsError;
         if (itemsData) setOrderItems(itemsData);
