@@ -10,7 +10,8 @@ interface LocationState {
 export function CheckoutSuccess() {
   const location = useLocation();
   const state = location.state as LocationState;
-
+  
+  
   if (!state?.orderId) {
     return <Navigate to="/shop" replace />;
   }
