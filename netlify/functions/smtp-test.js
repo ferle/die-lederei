@@ -5,62 +5,64 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 async function testSMTP() {
-  console.log('Starting SMTP test...\n');
-
   try {
+    console.log('Starting SMTP test...');
+
     // Create transporter with SMTP settings
-    console.log('Creating SMTP transporter...');
     const transporter = nodemailer.createTransport({
       host: 'smtp.world4you.com',
       port: 587,
       secure: false,
       auth: {
         user: 'manuel@ferlitsch.net',
-        pass: 'Blub83408205'
+        pass: 'Blub83408205',
       },
       tls: {
-        rejectUnauthorized: false
-      }
+        rejectUnauthorized: false,
+      },
     });
 
     // Verify connection
-    console.log('Verifying SMTP connection...');
     await transporter.verify();
-    console.log('✓ SMTP connection successful!\n');
+    console.log('SMTP connection successful!');
 
     // Send test email
-    console.log('Sending test email...');
     const info = await transporter.sendMail({
       from: {
         name: 'Johanna Lederwaren',
-        address: 'manuel@ferlitsch.net'
+        address: 'manuel@ferlitsch.net',
       },
       to: 'ferlitsch.manuel@gmail.com',
       subject: 'SMTP Test Email',
-      text: 'This is a test email to verify SMTP settings are working correctly.'
+      text: 'This is a test email to verify SMTP settings are working correctly.',
     });
 
-    console.log('✓ Test email sent successfully!');
+    console.log('Test email sent successfully!');
     console.log('Message ID:', info.messageId);
 
-    // Close connection
-    await transporter.close();
-    console.log('\nSMTP test completed successfully!');
+    return { success: true, messageId: info.messageId };
 
   } catch (error) {
-    console.error('\nSMTP test failed:', {
-      name: error.name,
-      message: error.message,
-      code: error.code,
-      command: error.command,
-      response: error.response
-    });
-    process.exit(1);
+    console.error('SMTP test failed:', error);
+    throw error;
   }
 }
 
-// Run the test
-testSMTP().catch(error => {
-  console.error('Unhandled error:', error);
-  process.exit(1);
-});
+// Export handler for Netlify
+export async function handler(event, context) {
+  try {
+    const result = await testSMTP();
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ message: 'SMTP test completed successfully', result }),
+    };
+  } catch (error) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        message: 'SMTP test failed',
+        error: error.message,
+      }),
+    };
+  }
+}
