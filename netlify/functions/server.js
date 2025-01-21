@@ -1,8 +1,9 @@
 import express from 'express';
 import cors from 'cors';
 import Stripe from 'stripe';
+import serverless from 'serverless-http';
 
-const stripe = new Stripe('sk_test_51QilW7PxH6E6bhVrYfEkHnbvhtJhZQ6qQ4xT6SQq7oLaV8T9fMhlHRod3uniy1gza3U2MyBOQ2dUF5gXGnIQL2Ky001QhWZkWy', { apiVersion: '2022-11-15' });
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_51QilW7PxH6E6bhVrYfEkHnbvhtJhZQ6qQ4xT6SQq7oLaV8T9fMhlHRod3uniy1gza3U2MyBOQ2dUF5gXGnIQL2Ky001QhWZkWy', { apiVersion: '2022-11-15' });
 
 const app = express();
 
@@ -30,4 +31,10 @@ app.post('/create-payment-intent', async (req, res) => {
     }
 });
 
-app.listen(3001, () => console.log('Server running on http://localhost:3001'));
+// Local server setup
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(3001, () => console.log('Server running on http://localhost:3001'));
+}
+
+// Export for Netlify serverless function
+export const handler = serverless(app);

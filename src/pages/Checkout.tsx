@@ -47,12 +47,19 @@ export function Checkout() {
     async function fetchClientSecret() {
       try {
         setIsLoading(true);
-        const { data } = await axios.post('http://localhost:3001/create-payment-intent', {
-          amount: totalPrice(),
-          currency: 'eur',
-          // amount: totalPrice(), // Pass the total price in cents
-          // currency: 'eur', // Adjust currency if necessary
+
+        // Determine backend URL dynamically
+        const baseURL =
+            window.location.hostname === 'localhost'
+                ? 'http://localhost:3001'
+                : 'https://<your-netlify-site>.netlify.app/.netlify/functions/server'; // Replace with your Netlify site domain
+
+        // Send request to backend
+        const { data } = await axios.post(`${baseURL}/create-payment-intent`, {
+          amount: totalPrice(), // Pass the total price in cents
+          currency: 'eur',      // Adjust currency if necessary
         });
+
         console.log(data);
         setClientSecret(data.clientSecret);
       } catch (err) {
@@ -62,6 +69,7 @@ export function Checkout() {
         setIsLoading(false);
       }
     }
+
 
     if (items.length > 0) {
       fetchClientSecret();

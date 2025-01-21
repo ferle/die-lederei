@@ -1,0 +1,21 @@
+[build]
+  # Directory where Netlify should look for the production build of your frontend
+  publish = "build"
+  # Directory where Netlify should look for serverless functions
+  functions = "netlify/functions"
+
+[functions]
+  # Set the Node.js version (optional but recommended to match your development environment)
+  node_bundler = "esbuild"
+
+[dev]
+  # Redirect backend requests to localhost for testing
+  framework = "create-react-app"
+  targetPort = 3000
+  port = 8888
+
+[[redirects]]
+  # Redirect API calls during development
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200

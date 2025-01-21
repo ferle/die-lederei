@@ -40,10 +40,14 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    const baseURL = window.location.hostname === 'localhost'
+        ? 'http://localhost:3001'
+        : 'https://die-lederei.netlify.app/.netlify/functions/server';
+
     async function fetchClientSecret() {
       try {
-        const { data } = await axios.post('http://localhost:3001/create-payment-intent', {
-          amount: 5000,
+        const { data } = await axios.post(`${baseURL}/create-payment-intent`, {
+          amount: 1000,
           currency: 'eur',
         });
         setClientSecret(data.clientSecret);
