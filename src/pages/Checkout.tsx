@@ -52,7 +52,7 @@ export function Checkout() {
         const baseURL =
             window.location.hostname === 'localhost'
                 ? 'http://localhost:3001'
-                : 'https://die-lederei.netlify.app/.netlify/functions/server/create-payment-intent'; // Replace with your Netlify site domain
+                : 'https://die-lederei.netlify.app/.netlify/functions/server'; // Replace with your Netlify site domain
 
         // Send request to backend
         const { data } = await axios.post(`${baseURL}/create-payment-intent`, {
