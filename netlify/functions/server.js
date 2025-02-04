@@ -7,11 +7,17 @@ import serverless from 'serverless-http';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2022-11-15' });
 
 const app = express();
-
 app.use(cors());
 app.use(express.json());
 
-app.post('/create-payment-intent', async (req, res) => {
+// ✅ Base route to test if function is running
+app.get('/', (req, res) => {
+    res.json({ message: "Netlify Stripe function is running!" });
+});
+
+// ✅ Fix: Use `/` for the function to work with Netlify’s path
+const router = express.Router();
+router.post('/create-payment-intent', async (req, res) => {
     try {
         const { amount, currency } = req.body;
 
@@ -31,6 +37,9 @@ app.post('/create-payment-intent', async (req, res) => {
         res.status(500).json({ error: 'Failed to create payment intent.' });
     }
 });
+
+// ✅ Attach the router under `/`
+app.use('/.netlify/functions/server', router);
 
 // Export for Netlify function
 export const handler = serverless(app);
