@@ -17,7 +17,7 @@ app.get('/', (req, res) => {
 
 // ✅ Fix: Use `/` for the function to work with Netlify’s path
 const router = express.Router();
-router.post('create-payment-intent', async (req, res) => {
+router.post('/create-payment-intent', async (req, res) => {
     try {
         const { amount, currency } = req.body;
 
