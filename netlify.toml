@@ -10,8 +10,8 @@
 
 [dev]
   # Redirect backend requests to localhost for testing
-  framework = "create-react-app"
-  targetPort = 3000
+  framework = "vite"
+  targetPort = 5173
   port = 8888
 
 [[redirects]]
