@@ -41,7 +41,7 @@ export default function App() {
 
   useEffect(() => {
     const baseURL = window.location.hostname === 'localhost'
-        ? 'http://localhost:3001'
+        ? 'http://localhost:8888/.netlify/functions/server'
         : 'https://die-lederei.netlify.app/.netlify/functions/server';
 
     async function fetchClientSecret() {

@@ -7,6 +7,12 @@ import { useAuthStore } from '../store/authStore';
 import { supabase } from '../lib/supabase';
 import { LoadingOverlay } from '../components/LoadingOverlay';
 import { useGooglePlacesAutocomplete } from '../hooks/useGooglePlacesAutocomplete';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseHard = createClient(
+    "https://srcmwjxskrirwyttrsjm.supabase.co", // Supabase URL
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNyY213anhza3Jpcnd5dHRyc2ptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY4NzU2ODYsImV4cCI6MjA1MjQ1MTY4Nn0.Q-tN2qjfIIFlnsU8xOeev3DtuPKeh8_Pnza1WzaYj0g" // 🔥 Replace with your actual API Key
+);
 
 export function Checkout() {
   const stripe = useStripe();
@@ -51,7 +57,7 @@ export function Checkout() {
         // Determine backend URL dynamically
         const baseURL =
             window.location.hostname === 'localhost'
-                ? 'http://localhost:3001'
+                ? 'http://localhost:8888/.netlify/functions/server'
                 : 'https://die-lederei.netlify.app/.netlify/functions/server'; // Replace with your Netlify site domain
 
         // Send request to backend
@@ -138,26 +144,29 @@ export function Checkout() {
       if (!form.first_name || !form.last_name || !form.email || !form.address || !form.city || !form.postalCode || !form.country) {
         throw new Error('Bitte füllen Sie alle Pflichtfelder aus.');
       }
-      
-      // Create order in the database
+
       const { data: order, error: orderError } = await supabase
           .from('orders')
-          .insert({
-            customer_name: `${form.first_name} ${form.last_name}`,
-            customer_email: form.email,
-            shipping_address: `${form.address}\n${form.postalCode} ${form.city}\n${form.country}`,
-            total_amount: totalPrice(),
-            notes: form.notes || 'EMPTY',
-            user_id: user?.id || null,
-            customer_phone: form.phone || null,
-            status: 'pending', // Default status for new orders
-            created_at: new Date().toISOString(), // Add created_at field
-          })
+          .insert([
+            {
+              customer_name: `${form.first_name} ${form.last_name}`,
+              customer_email: form.email,
+              shipping_address: `${form.address}\n${form.postalCode} ${form.city}\n${form.country}`,
+              total_amount: totalPrice(),
+              notes: form.notes || 'EMPTY',
+              user_id: user?.id || null,
+              customer_phone: form.phone || null,
+              status: 'pending',
+              created_at: new Date().toISOString(),
+            }
+          ])
           .select()
           .single();
 
-      console.log(orderError);
-      if (orderError) throw orderError;
+      if (orderError) {
+        console.error("Supabase Order Insert Error:", orderError);
+        throw orderError;
+      }
 
       const orderItems = items.map((item) => ({
         order_id: order.id,
