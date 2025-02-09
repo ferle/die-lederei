@@ -101,8 +101,8 @@ async function processEmailQueue() {
             .update({ status: 'sent', sent_at: new Date().toISOString() })
             .eq('id', email.id);
         } else {
-          console.log(result.error);
-          throw new Error(result.error);
+          console.log(result.error + "Blub");
+          throw new Error(result.error + "Blub");
         }
       } catch (error) {
         console.error(`Error processing email ${email.id}:`, error.message);
