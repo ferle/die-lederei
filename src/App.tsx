@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Link } from 'react-router-dom';
-import { Menu, X, ShoppingBag, LogIn } from 'lucide-react';
+import { Menu, X, ShoppingBag, LogIn, UserRound } from 'lucide-react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 import axios from 'axios';
@@ -105,7 +105,7 @@ export default function App() {
                       </div>
                   ) : (
                       <Link to="/login" className="text-burgundy-800 hover:text-burgundy-600 transition">
-                        <LogIn className="w-6 h-6" />
+                        <UserRound className="w-6 h-6" />
                       </Link>
                   )}
                 </div>

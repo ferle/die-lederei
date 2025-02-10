@@ -23,6 +23,8 @@ interface Settings {
     smtp_from_name: string;
     order_confirmation_subject: string;
     order_confirmation_template: string;
+    shipping_confirmation_subject: string;
+    shipping_confirmation_template: string;
     registration_subject: string;
     registration_template: string;
   };
@@ -919,6 +921,64 @@ export function Settings() {
                     Verfügbare Platzhalter: {'{customer_name}'}
                   </p>
                 </div>
+              </div>
+            </div>
+
+            {/* Shipping confirmation Template */}
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <h2 className="text-xl font-medium text-burgundy-900 mb-6">Versandbestätigung</h2>
+
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Betreff
+                  </label>
+                  <input
+                      type="text"
+                      value={settings.email_settings.shipping_confirmation_subject}
+                      onChange={(e) => setSettings({
+                        ...settings,
+                        email_settings: {
+                          ...settings.email_settings,
+                          shipping_confirmation_subject: e.target.value
+                        }
+                      })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-burgundy-500 focus:border-burgundy-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    E-Mail-Text
+                  </label>
+                  <textarea
+                      value={settings.email_settings.shipping_confirmation_template}
+                      onChange={(e) => setSettings({
+                        ...settings,
+                        email_settings: {
+                          ...settings.email_settings,
+                          shipping_confirmation_template: e.target.value
+                        }
+                      })}
+                      rows={10}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-burgundy-500 focus:border-burgundy-500"
+                  />
+                  <p className="mt-2 text-sm text-gray-500">
+                    Verfügbare
+                    Platzhalter: {'{customer_name}'}, {'{order_id}'}, {'{order_date}'}, {'{order_items}'}, {'{total_amount}'}, {'{shipping_address}'}
+                  </p>
+                </div>
+                <div className="flex justify-end mt-6">
+                  <button
+                      onClick={handleSaveSettings}
+                      disabled={isSaving}
+                      className="flex items-center gap-2 px-6 py-3 bg-burgundy-700 text-white rounded-lg hover:bg-burgundy-800 transition disabled:opacity-50"
+                  >
+                    <Save className="w-5 h-5"/>
+                    Speichern
+                  </button>
+                </div>
+
               </div>
             </div>
           </div>
