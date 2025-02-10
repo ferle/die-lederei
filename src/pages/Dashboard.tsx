@@ -124,8 +124,7 @@ export function Dashboard() {
 
       <div className="max-w-7xl mx-auto py-16 px-6">
         <div className="mb-12">
-          <h1 className="text-4xl font-typewriter text-burgundy-800 mb-4">Willkommen im Dashboard</h1>
-          <p className="text-lg text-burgundy-600">Hier finden Sie eine Übersicht Ihres Online-Shops.</p>
+          <h1 className="text-4xl font-typewriter text-burgundy-800 mb-4">Dashboard</h1>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

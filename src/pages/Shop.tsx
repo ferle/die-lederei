@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ProductCard } from '../components/ProductCard';
 import { supabase } from '../lib/supabase';
 import { LoadingOverlay } from '../components/LoadingOverlay';
+import {query} from "express";
 
 interface Product {
   id: string;
@@ -15,9 +16,11 @@ interface Product {
 
 export function Shop() {
   const [products, setProducts] = useState<Product[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedCategory, setSelectedCategory] = useState<string>('alle');
   const [isLoading, setIsLoading] = useState(true);
-  const categories = ['all', 'gürtel', 'taschen', 'schuhe', 'accessoires'];
+  const categories = ['alle', 'gürtel', 'taschen', 'schuhe', 'accessoires'];
+  
+  
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -25,7 +28,7 @@ export function Shop() {
       try {
         let query = supabase.from('products').select('*');
         
-        if (selectedCategory !== 'all') {
+        if (selectedCategory !== 'alle') {
           query = query.eq('category', selectedCategory);
         }
 
@@ -51,7 +54,7 @@ export function Shop() {
       <header className="relative py-24 bg-burgundy-50">
         <div className="absolute inset-0 opacity-5 bg-[url('https://www.transparenttextures.com/patterns/leather.png')]"></div>
         <div className="relative max-w-7xl mx-auto px-6 lg:px-12 text-center">
-          <span className="font-typewriter text-burgundy-700 tracking-wider">Handgefertigt in Deutschland</span>
+          <span className="font-typewriter text-burgundy-700 tracking-wider">Handgefertigt in Österreich</span>
           <h1 className="text-5xl mt-4 mb-6 text-burgundy-900">Unsere Kollektion</h1>
           <p className="text-lg text-burgundy-800/80 max-w-2xl mx-auto italic">
             Entdecken Sie unsere handgefertigten Lederwaren – jedes Stück ein Unikat, 

@@ -17,7 +17,7 @@ export function Footer() {
             </p>
             <div className="flex space-x-4 text-burgundy-700">
               <a 
-                href="https://instagram.com" 
+                href="https://www.instagram.com/johanna_die_lederei/" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="hover:text-burgundy-800 transition"
@@ -25,7 +25,7 @@ export function Footer() {
                 <Instagram />
               </a>
               <a 
-                href="mailto:kontakt@johanna-leder.de"
+                href="mailto:johanna@die-lederei.at"
                 className="hover:text-burgundy-800 transition"
               >
                 <Mail />
@@ -77,15 +77,15 @@ export function Footer() {
             <ul className="space-y-3 text-gray-600">
               <li className="flex items-center space-x-2">
                 <MapPin className="w-5 h-5 text-burgundy-700" />
-                <span>Lederweg 1, 80331 München</span>
+                <span>Magetsham 21, 4923 Magetsham</span>
               </li>
               <li className="flex items-center space-x-2">
                 <Phone className="w-5 h-5 text-burgundy-700" />
-                <span>+49 (0) 89 123456</span>
+                <span>+43 (0) 676 5174348</span>
               </li>
               <li className="flex items-center space-x-2">
                 <Mail className="w-5 h-5 text-burgundy-700" />
-                <span>kontakt@johanna-leder.de</span>
+                <span>johanna@die-lederei.at</span>
               </li>
             </ul>
           </div>
@@ -94,7 +94,7 @@ export function Footer() {
         <div className="mt-12 pt-8 border-t border-stone-200">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0 text-sm text-gray-600">
             <div>
-              © {new Date().getFullYear()} Johanna Lederwaren. Alle Rechte vorbehalten.
+              © {new Date().getFullYear()} Johanna Schrattenecker - Die Lederei | Alle Rechte vorbehalten.
             </div>
             <div className="flex space-x-6">
               <Link to="/datenschutz" className="hover:text-burgundy-700 transition">

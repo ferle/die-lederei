@@ -91,10 +91,10 @@ export function CheckoutSuccess() {
             <p className="text-sm text-gray-600">
               Bei Fragen zu Ihrer Bestellung kontaktieren Sie uns gerne unter{' '}
               <a 
-                href="mailto:kontakt@johanna-leder.de" 
+                href="mailto:johanna@die-lederei.at" 
                 className="text-burgundy-700 hover:text-burgundy-800"
               >
-                kontakt@johanna-leder.de
+                johanna@die-lederei.at
               </a>
             </p>
           </div>
